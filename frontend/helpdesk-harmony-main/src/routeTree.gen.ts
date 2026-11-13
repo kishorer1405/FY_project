@@ -10,41 +10,28 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as UserRegisterRouteImport } from './routes/user.register'
-import { Route as UserLoginRouteImport } from './routes/user.login'
-import { Route as UserDashboardRouteImport } from './routes/user.dashboard'
-import { Route as AuthorityRegisterRouteImport } from './routes/authority.register'
-import { Route as AuthorityLoginRouteImport } from './routes/authority.login'
+import { Route as AdminDashboardRouteImport } from './routes/admin.dashboard'
+import { Route as AdminLoginRouteImport } from './routes/admin.login'
 import { Route as AuthorityDashboardRouteImport } from './routes/authority.dashboard'
+import { Route as AuthorityLoginRouteImport } from './routes/authority.login'
+import { Route as AuthorityRegisterRouteImport } from './routes/authority.register'
+import { Route as UserDashboardRouteImport } from './routes/user.dashboard'
+import { Route as UserLoginRouteImport } from './routes/user.login'
+import { Route as UserRegisterRouteImport } from './routes/user.register'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const UserRegisterRoute = UserRegisterRouteImport.update({
-  id: '/user/register',
-  path: '/user/register',
+const AdminDashboardRoute = AdminDashboardRouteImport.update({
+  id: '/admin/dashboard',
+  path: '/admin/dashboard',
   getParentRoute: () => rootRouteImport,
 } as any)
-const UserLoginRoute = UserLoginRouteImport.update({
-  id: '/user/login',
-  path: '/user/login',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const UserDashboardRoute = UserDashboardRouteImport.update({
-  id: '/user/dashboard',
-  path: '/user/dashboard',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AuthorityRegisterRoute = AuthorityRegisterRouteImport.update({
-  id: '/authority/register',
-  path: '/authority/register',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AuthorityLoginRoute = AuthorityLoginRouteImport.update({
-  id: '/authority/login',
-  path: '/authority/login',
+const AdminLoginRoute = AdminLoginRouteImport.update({
+  id: '/admin/login',
+  path: '/admin/login',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthorityDashboardRoute = AuthorityDashboardRouteImport.update({
@@ -52,9 +39,36 @@ const AuthorityDashboardRoute = AuthorityDashboardRouteImport.update({
   path: '/authority/dashboard',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthorityLoginRoute = AuthorityLoginRouteImport.update({
+  id: '/authority/login',
+  path: '/authority/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthorityRegisterRoute = AuthorityRegisterRouteImport.update({
+  id: '/authority/register',
+  path: '/authority/register',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const UserDashboardRoute = UserDashboardRouteImport.update({
+  id: '/user/dashboard',
+  path: '/user/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const UserLoginRoute = UserLoginRouteImport.update({
+  id: '/user/login',
+  path: '/user/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const UserRegisterRoute = UserRegisterRouteImport.update({
+  id: '/user/register',
+  path: '/user/register',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/admin/dashboard': typeof AdminDashboardRoute
+  '/admin/login': typeof AdminLoginRoute
   '/authority/dashboard': typeof AuthorityDashboardRoute
   '/authority/login': typeof AuthorityLoginRoute
   '/authority/register': typeof AuthorityRegisterRoute
@@ -64,6 +78,8 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/admin/dashboard': typeof AdminDashboardRoute
+  '/admin/login': typeof AdminLoginRoute
   '/authority/dashboard': typeof AuthorityDashboardRoute
   '/authority/login': typeof AuthorityLoginRoute
   '/authority/register': typeof AuthorityRegisterRoute
@@ -74,6 +90,8 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/admin/dashboard': typeof AdminDashboardRoute
+  '/admin/login': typeof AdminLoginRoute
   '/authority/dashboard': typeof AuthorityDashboardRoute
   '/authority/login': typeof AuthorityLoginRoute
   '/authority/register': typeof AuthorityRegisterRoute
@@ -85,6 +103,8 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/admin/dashboard'
+    | '/admin/login'
     | '/authority/dashboard'
     | '/authority/login'
     | '/authority/register'
@@ -94,6 +114,8 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/admin/dashboard'
+    | '/admin/login'
     | '/authority/dashboard'
     | '/authority/login'
     | '/authority/register'
@@ -103,6 +125,8 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/admin/dashboard'
+    | '/admin/login'
     | '/authority/dashboard'
     | '/authority/login'
     | '/authority/register'
@@ -113,6 +137,8 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AdminDashboardRoute: typeof AdminDashboardRoute
+  AdminLoginRoute: typeof AdminLoginRoute
   AuthorityDashboardRoute: typeof AuthorityDashboardRoute
   AuthorityLoginRoute: typeof AuthorityLoginRoute
   AuthorityRegisterRoute: typeof AuthorityRegisterRoute
@@ -130,39 +156,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/user/register': {
-      id: '/user/register'
-      path: '/user/register'
-      fullPath: '/user/register'
-      preLoaderRoute: typeof UserRegisterRouteImport
+    '/admin/dashboard': {
+      id: '/admin/dashboard'
+      path: '/admin/dashboard'
+      fullPath: '/admin/dashboard'
+      preLoaderRoute: typeof AdminDashboardRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/user/login': {
-      id: '/user/login'
-      path: '/user/login'
-      fullPath: '/user/login'
-      preLoaderRoute: typeof UserLoginRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/user/dashboard': {
-      id: '/user/dashboard'
-      path: '/user/dashboard'
-      fullPath: '/user/dashboard'
-      preLoaderRoute: typeof UserDashboardRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/authority/register': {
-      id: '/authority/register'
-      path: '/authority/register'
-      fullPath: '/authority/register'
-      preLoaderRoute: typeof AuthorityRegisterRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/authority/login': {
-      id: '/authority/login'
-      path: '/authority/login'
-      fullPath: '/authority/login'
-      preLoaderRoute: typeof AuthorityLoginRouteImport
+    '/admin/login': {
+      id: '/admin/login'
+      path: '/admin/login'
+      fullPath: '/admin/login'
+      preLoaderRoute: typeof AdminLoginRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/authority/dashboard': {
@@ -172,11 +177,48 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthorityDashboardRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/authority/login': {
+      id: '/authority/login'
+      path: '/authority/login'
+      fullPath: '/authority/login'
+      preLoaderRoute: typeof AuthorityLoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/authority/register': {
+      id: '/authority/register'
+      path: '/authority/register'
+      fullPath: '/authority/register'
+      preLoaderRoute: typeof AuthorityRegisterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/user/dashboard': {
+      id: '/user/dashboard'
+      path: '/user/dashboard'
+      fullPath: '/user/dashboard'
+      preLoaderRoute: typeof UserDashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/user/login': {
+      id: '/user/login'
+      path: '/user/login'
+      fullPath: '/user/login'
+      preLoaderRoute: typeof UserLoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/user/register': {
+      id: '/user/register'
+      path: '/user/register'
+      fullPath: '/user/register'
+      preLoaderRoute: typeof UserRegisterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AdminDashboardRoute: AdminDashboardRoute,
+  AdminLoginRoute: AdminLoginRoute,
   AuthorityDashboardRoute: AuthorityDashboardRoute,
   AuthorityLoginRoute: AuthorityLoginRoute,
   AuthorityRegisterRoute: AuthorityRegisterRoute,

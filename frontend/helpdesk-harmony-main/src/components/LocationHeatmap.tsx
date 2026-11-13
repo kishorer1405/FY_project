@@ -1,5 +1,6 @@
 import { lazy, Suspense, useEffect, useState } from "react";
 import { api } from "../lib/api";
+import { useLanguage } from "../i18n/useLanguage";
 import type { HeatPoint } from "./BengaluruGeoMap";
 
 type Summary = {
@@ -8,15 +9,12 @@ type Summary = {
   status_breakdown: Array<{ status: string; count: number }>;
 };
 
-type Props = {
-  title: string;
-  department?: string;
-  userId?: string | null;
-};
+type Props = { title: string; department?: string; userId?: string | null };
 
 const BengaluruGeoMap = lazy(() => import("./BengaluruGeoMap").then((module) => ({ default: module.BengaluruGeoMap })));
 
 export function LocationHeatmap({ title, department, userId }: Props) {
+  const { t } = useLanguage();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [points, setPoints] = useState<HeatPoint[]>([]);
@@ -30,11 +28,9 @@ export function LocationHeatmap({ title, department, userId }: Props) {
         const params = new URLSearchParams();
         if (department) params.set("department", department);
         if (userId) params.set("user_id", userId);
-
         const query = params.toString() ? `?${params.toString()}` : "";
         const heatmapData = await api<{ points: HeatPoint[] }>(`/insights/heatmap${query}`);
         const summaryData = await api<Summary>(`/insights/summary${query}`);
-
         setPoints(heatmapData.points || []);
         setSummary(summaryData);
       } catch (err: any) {
@@ -43,14 +39,13 @@ export function LocationHeatmap({ title, department, userId }: Props) {
         setLoading(false);
       }
     };
-
     load();
   }, [department, userId]);
 
   return (
-    <Suspense fallback={<section className="crs-card"><p className="text-sm text-muted-foreground">Loading Bengaluru map...</p></section>}>
+    <Suspense fallback={<section className="crs-card"><p className="text-sm text-muted-foreground">{t("loadingMap")}</p></section>}>
       <BengaluruGeoMap title={title} points={points} summary={summary} />
-      {loading && <p className="mt-3 text-sm text-muted-foreground">Refreshing map data...</p>}
+      {loading && <p className="mt-3 text-sm text-muted-foreground">{t("refreshingMap")}</p>}
       {error && <p className="mt-3 text-sm text-destructive">{error}</p>}
     </Suspense>
   );

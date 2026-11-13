@@ -1,8 +1,9 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState, useCallback } from "react";
-import { api } from "../lib/api";
+import { api, downloadComplaintReport } from "../lib/api";
 import { Alert } from "../components/Alert";
 import { LocationHeatmap } from "../components/LocationHeatmap";
+import { useLanguage } from "../i18n/useLanguage";
 
 export const Route = createFileRoute("/authority/dashboard")({
   component: AuthorityDashboard,
@@ -29,6 +30,7 @@ const statusClass = (s?: string) => {
 };
 
 function AuthorityDashboard() {
+  const { t } = useLanguage();
   const navigate = useNavigate();
   const [department, setDepartment] = useState<string | null>(null);
   const [complaints, setComplaints] = useState<Complaint[]>([]);
@@ -36,6 +38,16 @@ function AuthorityDashboard() {
   const [error, setError] = useState("");
   const [updating, setUpdating] = useState<string | null>(null);
   const [toast, setToast] = useState<{ kind: "success" | "error"; text: string }>({ kind: "success", text: "" });
+  const [reporting, setReporting] = useState<string | null>(null);
+
+  const translateValue = (value?: string) => {
+    const labels: Record<string, string> = {
+      Pending: t("pending"), "In Process": t("inProcess"), Completed: t("completed"), Rejected: t("rejected"),
+      Electrical: t("electrical"), Electricity: t("electrical"), Water: t("water"), Garbage: t("garbage"),
+      Road: t("road"), Fire: t("fire"), Other: t("other"), Low: "Low", Medium: "Medium", High: "High",
+    };
+    return value ? labels[value] || value : value;
+  };
 
   useEffect(() => {
     const dep = localStorage.getItem("department");
@@ -77,7 +89,7 @@ function AuthorityDashboard() {
       setComplaints((prev) =>
         prev.map((x) => ((x.id ?? x._id) === id ? { ...x, status } : x))
       );
-      setToast({ kind: "success", text: "Status updated." });
+      setToast({ kind: "success", text: t("statusUpdated") });
     } catch (err: any) {
       setToast({ kind: "error", text: err.message });
     } finally {
@@ -85,14 +97,25 @@ function AuthorityDashboard() {
     }
   };
 
+  const downloadReport = async (id: string) => {
+    setReporting(id);
+    try {
+      await downloadComplaintReport(id);
+    } catch (err: any) {
+      setToast({ kind: "error", text: err.message });
+    } finally {
+      setReporting(null);
+    }
+  };
+
   return (
     <div className="max-w-5xl mx-auto px-4 py-8">
       <div className="flex items-center justify-between mb-5 flex-wrap gap-2">
         <div>
-          <h1 className="text-2xl font-bold">Department dashboard</h1>
-          <p className="text-sm text-muted-foreground">
-            Showing complaints for{" "}
-            <span className="crs-badge">{department}</span>
+          <h1 className="text-2xl font-bold">{t("departmentDashboard")}</h1>
+            <p className="text-sm text-muted-foreground">
+              {t("showingComplaints")}{" "}
+            <span className="crs-badge">{translateValue(department || "")}</span>
           </p>
         </div>
         <button
@@ -100,7 +123,7 @@ function AuthorityDashboard() {
           className="crs-btn crs-btn-ghost text-sm"
           disabled={loading}
         >
-          {loading ? "Loading..." : "Refresh"}
+          {loading ? t("loading") : t("refresh")}
         </button>
       </div>
 
@@ -109,7 +132,7 @@ function AuthorityDashboard() {
 
       {!loading && complaints.length === 0 && !error && (
         <div className="crs-card text-center text-muted-foreground">
-          No complaints assigned to this department yet.
+          {t("noAssignedComplaints")}
         </div>
       )}
 
@@ -120,15 +143,15 @@ function AuthorityDashboard() {
             <article key={id} className="crs-card">
               <div className="flex items-start justify-between gap-3 flex-wrap">
                 <p className="text-sm font-medium leading-relaxed flex-1 min-w-[200px]">{c.text}</p>
-                <span className={statusClass(c.status)}>{c.status || "Pending"}</span>
+                <span className={statusClass(c.status)}>{translateValue(c.status) || t("pending")}</span>
               </div>
               <div className="mt-3 flex flex-wrap gap-2 text-xs">
                 {c.location && <span className="crs-badge">📍 {c.location}</span>}
-                {c.category && <span className="crs-badge">Category: {c.category}</span>}
-                {c.priority && <span className="crs-badge">Priority: {c.priority}</span>}
+                {c.category && <span className="crs-badge">{t("category")}: {translateValue(c.category)}</span>}
+                {c.priority && <span className="crs-badge">{t("priority")}: {translateValue(c.priority)}</span>}
               </div>
               <div className="mt-4 flex items-center gap-2 flex-wrap">
-                <label className="text-xs text-muted-foreground">Update status:</label>
+                <label className="text-xs text-muted-foreground">{t("updateStatus")}</label>
                 <select
                   className="crs-input max-w-[180px]"
                   value={c.status && STATUSES.includes(c.status as any) ? c.status : "Pending"}
@@ -136,11 +159,19 @@ function AuthorityDashboard() {
                   onChange={(e) => updateStatus(c, e.target.value)}
                 >
                   {STATUSES.map((s) => (
-                    <option key={s} value={s}>{s}</option>
+                    <option key={s} value={s}>{translateValue(s)}</option>
                   ))}
                 </select>
-                {updating === id && <span className="text-xs text-muted-foreground">Saving…</span>}
+                {updating === id && <span className="text-xs text-muted-foreground">{t("saving")}</span>}
               </div>
+              <button
+                type="button"
+                className="crs-btn crs-btn-ghost text-sm mt-3"
+                disabled={reporting === id}
+                onClick={() => downloadReport(id)}
+              >
+                {reporting === id ? t("preparing") : t("downloadPdf")}
+              </button>
             </article>
           );
         })}
@@ -148,7 +179,7 @@ function AuthorityDashboard() {
 
       <div className="mt-6">
         <LocationHeatmap
-          title="Department Heatmap Insights"
+          title={t("departmentHeatmap")}
           department={department || undefined}
         />
       </div>

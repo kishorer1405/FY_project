@@ -6,8 +6,12 @@ export async function api<T = any>(
   path: string,
   options: RequestInit = {}
 ): Promise<T> {
+  const token = typeof window !== "undefined" ? localStorage.getItem("session_token") : null;
+  const headers = new Headers(options.headers);
+  headers.set("Content-Type", "application/json");
+  if (token) headers.set("Authorization", `Bearer ${token}`);
   const res = await fetch(`${API_BASE}${path}`, {
-    headers: { "Content-Type": "application/json", ...(options.headers || {}) },
+    headers,
     ...options,
   });
   const text = await res.text();
@@ -22,6 +26,42 @@ export async function api<T = any>(
     throw new Error(msg);
   }
   return data as T;
+}
+
+export async function downloadComplaintReport(complaintId: string | number): Promise<void> {
+  const token = typeof window !== "undefined" ? localStorage.getItem("session_token") : null;
+  const response = await fetch(`${API_BASE}/complaint/${complaintId}/report`, {
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
+  });
+  if (!response.ok) {
+    const data = await response.json().catch(() => null);
+    throw new Error(data?.error || `Report download failed (${response.status})`);
+  }
+  const blob = await response.blob();
+  const url = URL.createObjectURL(blob);
+  const anchor = document.createElement("a");
+  anchor.href = url;
+  anchor.download = `complaint-${complaintId}.pdf`;
+  anchor.click();
+  URL.revokeObjectURL(url);
+}
+
+export async function downloadAdminReport(type: string): Promise<void> {
+  const token = typeof window !== "undefined" ? localStorage.getItem("session_token") : null;
+  const response = await fetch(`${API_BASE}/admin/report?type=${encodeURIComponent(type)}`, {
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
+  });
+  if (!response.ok) {
+    const data = await response.json().catch(() => null);
+    throw new Error(data?.error || `Report download failed (${response.status})`);
+  }
+  const blob = await response.blob();
+  const url = URL.createObjectURL(blob);
+  const anchor = document.createElement("a");
+  anchor.href = url;
+  anchor.download = `admin-${type}-report.pdf`;
+  anchor.click();
+  URL.revokeObjectURL(url);
 }
 
 export function fileToBase64(file: File): Promise<string> {
